@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+		<script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+      
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link href="css/simple-sidebar.css" rel="stylesheet">
+        
+    	
+    
+        <title>Dinos Cup</title>
+    </head>
+    <body style="display:none">
+         <div id="wrapper">
+
+                <!-- Sidebar -->
+                <div id="sidebar-wrapper">
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-brand">
+                            Menu Dinos Cup
+                        </li>
+                        <li>
+                            <a href="#">Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="#">Shortcuts</a>
+                        </li>
+                        <li>
+                            <a href="#">Overview</a>
+                        </li>
+                        <li>
+                            <a href="#">Events</a>
+                        </li>
+                        <li>
+                            <a href="#">About</a>
+                        </li>
+                        <li>
+                            <a href="#">Services</a>
+                        </li>
+                        <li>
+                            <a href="#" onClick="logoutFB()">Sair</a>
+                        </li>
+                    </ul>
+                </div>
+                         
+                <div id="page-content-wrapper">
+                    <div class="row">
+                        <img src="img/DINOSCUP1.png" width="100%">
+                    </div>
+                	<div class="container">
+	                    <div class="row">
+                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+                    		
+                             
+                        </div>
+                        <div class="row">
+                        	RANKING
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                
+                                <table class="table text-center table-striped table-bordered" >
+                                    <tr>
+                                        <td>Nome</td>
+                                        <td>Campeonatos</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Japa</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tavis</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Babs</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rubis</td>
+                                        <td>0</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                	</div>
+	        	</div>
+   		</div>
+        <script language="javascript">
+			var nome='';
+			var email='';
+			
+			document.addEventListener("deviceready", onDeviceReady, false);
+	
+			function onDeviceReady() {
+				//$('#menu').load('menu.html',function(){
+				//$('#nome').html(window.localStorage["nome"]);
+				//$('body').removeAttr('style');
+				$('body').fadeIn();
+				//});
+				
+			}
+			$("#idMenu").on('vmousedown', function(e){$(this).focus().click();})
+			$("#idMenu").on("touchend", function (e) { 
+				e.preventDefault();
+				$("#wrapper").toggleClass("toggled");
+			});
+			
+			
+			function logoutFB(){
+				window.localStorage["logado"]='0';
+				if(window.localStorage["modo_login"]=='facebook'){
+					facebookConnectPlugin.logout(function(){});
+				}
+				document.location='index.html';
+			}
+			
+			$("#menu-toggle").click(function(e) {
+				e.preventDefault();
+				$("#wrapper").toggleClass("toggled");
+			});
+			
+		</script>
+    </body>
+</html>

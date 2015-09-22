@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=yes" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+		<script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+       
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    
+    	<script>
+		document.addEventListener("deviceready", onDeviceReady, false);
+
+		function onDeviceReady() {
+			$('body').removeAttr('style');
+			facebookConnectPlugin.getLoginStatus(
+				function(response){
+					if(response.status=='connected'){
+						facebookConnectPlugin.api('/me?fields=id,name,email', null,
+							 function(response) {
+								 window.localStorage["nome"]=response.name;
+								 window.localStorage["id"]=response.id;
+								 window.localStorage["email"]=response.email;
+								 window.localStorage["logado"]='1';
+								 window.localStorage["modo_login"]='facebook';
+								 document.location='logado.html';
+							 }
+						);
+					}
+				}
+			);
+			
+		}
+		
+		
+		function loginFB(){
+			facebookConnectPlugin.login(["public_profile","email"],
+				function(response){
+					
+					facebookConnectPlugin.api('/me?fields=id,name,email', null,
+						 function(response) {
+							 $.ajax({
+								method: "POST",
+								url: "http://www.multimsg.com.br/app/dinoscup/auth.php",
+								data: { modo_login: "facebook", nome: response.name, id: response.id, email: response.email }
+							}).done(function(html) {
+								window.localStorage["nome"]=response.name;
+								window.localStorage["id"]=response.id;
+								window.localStorage["email"]=response.email;
+								window.localStorage["logado"]='1';
+								window.localStorage["modo_login"]='facebook';
+								document.location='logado.html';
+							});
+						 }
+					);
+					
+				},function(){
+					$('#msg').html('Erro ao logar');
+				});
+		}
+		function criarLogin(){
+			$('#myModalCadastro').modal('show');
+		}
+		function criarUsuario(){
+			var usuario=$('#cpUsuario').val();
+			var senha=$('#cpCSenha').val();
+			var csenha=$('#cpCSenha').val();
+			var nome=$('#cpNome').val();
+			var email=$('#cpEmail').val();
+			
+			if(csenha!=senha){
+				alert('Confirme sua senha');
+				return true;
+			}
+			if(usuario==''){
+				alert('Usuário inválido');
+				return true;
+			}
+			if(senha==''){
+				alert('Senha Inválida');
+				return true;
+			}
+			if(nome==''){
+				alert('Nome inválido');
+				return true;
+			}
+			if(email==''){
+				alert('E-mail inválido');
+				return true;
+			}
+			$.ajax({
+				method: "POST",
+				url: "http://www.multimsg.com.br/app/dinoscup/auth.php",
+				data: { modo_login: "normal", nome: nome, id: email, email: email, usuario: usuario, senha:senha},
+				beforeSend: function(){
+					$('#btCriarUsuarioOK').attr("disabled","disabled");
+					$('#btCriarUsuarioCancelar').attr("disabled","disabled");
+					$('#msgCriar').html('');
+				}
+			}).done(function( html ) {
+				$('#btCriarUsuarioOK').removeAttr("disabled");
+				$('#btCriarUsuarioCancelar').removeAttr("disabled");
+				if(html=='1'){
+					alert('Cadastrado com sucesso!');
+					$('#myModalCadastro').modal('hide');
+				}else{
+					$('#msgCriar').html('Problemas para criar seu usuário');	
+				}
+			});
+		}
+		function btAcessar(){
+			var usuarioLogin=$('#cpLoginUsuario').val();
+			var senhaLogin=$('#cpLoginSenha').val();
+			$.ajax({
+				method: "POST",
+				url: "http://www.multimsg.com.br/app/dinoscup/loginNormal.php",
+				dataType:"json",
+				cache: false,
+				data: { usuario: usuarioLogin, senha: senhaLogin}
+				,beforeSend: function(){
+					$('#btAcessar').html('Carregando..');
+					$('#btAcessar').attr("disabled","disabled");
+					$('#msg').html('');
+				}
+			}).done(function(json){
+				$('#btAcessar').removeAttr("disabled");
+				$('#btAcessar').html('Acessar');
+				if(json){
+					window.localStorage["nome"]=json[0].nome;
+					window.localStorage["id"]=json[0].id;
+					window.localStorage["email"]=json[0].email;
+					window.localStorage["logado"]='1';
+					window.localStorage["modo_login"]='normal';
+					document.location='logado.html';
+				}else{
+					$('#msg').html('Erro ao logar');
+				}
+			})
+		}
+		
+	
+		
+		</script>
+    
+        <title>Dinos Cup</title>
+    </head>
+    <body style="display:none">
+    	<div class="container">
+            <div class="row">
+                <img src="img/DINOSCUP1.png" class="img-responsive" width="100%">
+            </div>
+            <div class="row">&nbsp;</div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <table class="table text-center table-striped table-bordered" >
+                        <tr>
+                            <td>Login:</td>
+                            <td><input id="cpLoginUsuario" type="text" placeholder="Login" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>Senha</td>
+                            <td><input id="cpLoginSenha" placeholder="senha" type="password" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><button class="btn btn-default" onClick="btAcessar()" id="btAcessar">Acessar</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><a href="#" onClick="criarLogin()">Criar conta</a> | Esqueci a senha</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+            	<div id="msg"></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    ou
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <button class="btn btn-primary" onClick="loginFB()">LOGIN COM FACEBOOK</button>
+                </div>
+            </div>
+    	</div>
+        <!-- /.MODAL -->
+        <div class="modal fade" id="myModalCadastro" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalTitulo">Criando seu usuário</h4>
+              </div>
+              <div class="modal-body">
+                	<div class="form-group">
+                    	<label for="cpUsuario">Usuário</label>
+                    	<input type="text" class="form-control" id="cpUsuario" placeholder="Usuário">
+                  	</div>
+                    <div class="form-group">
+                    	<label for="cpSenha">Senha</label>
+                    	<input type="password" class="form-control" id="cpSenha" placeholder="Senha">
+                  	</div>
+                    <div class="form-group">
+                    	<label for="cpCSenha">Confirme a senha</label>
+                    	<input type="password" class="form-control" id="cpCSenha" placeholder="Confirme a senha">
+                  	</div>
+                    <div class="form-group">
+                    	<label for="cpNome">Nome</label>
+                    	<input type="text" class="form-control" id="cpNome" placeholder="Nome">
+                  	</div>
+                    <div class="form-group">
+                    	<label for="cpEmail">E-mail</label>
+                    	<input type="email" class="form-control" id="cpEmail" placeholder="E-mail">
+                  	</div>
+                    <div class="row text-center" id="msgCriar"></div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="btCriarUsuarioCancelar">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btCriarUsuarioOK" onClick="criarUsuario()">Criar Usuário</button>
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </body>
+</html>
